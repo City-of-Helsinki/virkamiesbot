@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
-
-import tweepy
 import requests
+
 
 api_url = 'https://dev.hel.fi/paatokset/v1/agenda_item/'
 
 def fetch_decisions():
     # policymakers = get_policymaker_ids()
     policymakers = ["u541000vh1", "u51105100vh1", "u5110510020vh1"]
+    permalink_list = []
     for pmaker in policymakers:
-        payload = {'meeting__policymaker__slug': pmaker}
-        requests.get(api_url, params=payload)
-    decisions = requests.get(api_url)
+        payload = {'meeting__policymaker__slug': pmaker,
+                   'order_by': 'last_modified_time', 'limit': 1}
+        response = requests.get(api_url, params=payload)
+        decisions = response.json()
+        for d in decisions['objects']:
+            permalink_list.append(d['permalink'])
 
-    return decisions
-
+    return permalink_list
 
 """Policymaker ids whose decisions are followed from Open Ahjo API
 """

@@ -1,16 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pprint
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 from virkamiesbot.bot import fetch_decisions
-
-pp = pprint.PrettyPrinter(indent=4)
+from virkamiesbot.twitter import handle_twitter, initialize_twitter
 
 LOG = logging.getLogger(__name__)
 
 class Index(View):
-    d = fetch_decisions()
-    pp.pprint("##########################")
-    pp.pprint(d.text)
+    def get(self, request, *args, **kwargs):
+        decision_data = fetch_decisions()
+        twitter = initialize_twitter()
+        success_list = []
+        for d in decision_data:
+            tweet_successful = handle_twitter(d, twitter)
+            if tweet_successful:
+                success_list.append(d)
+            else:
+                success_list.append('------------failed------------')
+
+        return HttpResponse(str(success_list))
