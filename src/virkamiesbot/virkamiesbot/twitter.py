@@ -3,7 +3,7 @@ from virkamiesbot.settings import (TWITTER_A_TOKEN, TWITTER_A_TOKEN_SECRET,
                                    TWITTER_C_KEY,TWITTER_C_SECRET)
 
 SEARCH_STRING = ''
-DEFAULT_TAGS = ['#Helsinki', '#Virkamiespäätös']
+DEFAULT_TAGS = ['#Helsinki', '#Päätös']
 
 def handle_twitter(decision_data, twitter):
     tweet_content = generate_tweet_text(decision_data)
