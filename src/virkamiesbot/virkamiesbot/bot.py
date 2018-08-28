@@ -1,22 +1,29 @@
 # -*- coding: utf-8 -*-
 import requests
+from django.utils.html import strip_tags, escape
 
 
 api_url = 'https://dev.hel.fi/paatokset/v1/agenda_item/'
 
 def fetch_decisions():
-    # policymakers = get_policymaker_ids()
-    policymakers = ["u541000vh1", "u51105100vh1", "u5110510020vh1"]
-    permalink_list = []
+    policymakers = get_policymaker_ids()
+    # policymakers = ["u541000vh1", "u51105100vh1", "u5110510020vh1"]
+    filtered_decisions = []
     for pmaker in policymakers:
         payload = {'meeting__policymaker__slug': pmaker,
                    'order_by': 'last_modified_time', 'limit': 1}
         response = requests.get(api_url, params=payload)
-        decisions = response.json()
-        for d in decisions['objects']:
-            permalink_list.append(d['permalink'])
+        if response.ok:
+            decisions = response.json()
+            if decisions['meta']['total_count'] > 0:
+                for d in decisions['objects']:
+                    decision = {'policymaker': d['meeting']['policymaker_name'],
+                                'content': strip_tags(d['content'][0]['text']),
+                                'districts': districts_to_string(d['issue']['districts']),
+                                'permalink': d['permalink']}
+                    filtered_decisions.append(decision)
 
-    return permalink_list
+    return filtered_decisions
 
 """Policymaker ids whose decisions are followed from Open Ahjo API
 """
@@ -51,3 +58,11 @@ def get_policymaker_ids():
            "u511052003040vh1", "u511052003010vh1", "u51105400vh1",
            "u5110540010vh1", "u5110540050vh1", "u511054001010vh1"]
     return ids
+
+
+def districts_to_string(districts):
+    district_string = ''
+    for dist in districts:
+        if dist['type'] == 'kaupunginosa':
+            district_string += ' #%s' % dist['name']
+    return district_string.strip()

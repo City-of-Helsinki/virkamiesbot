@@ -11,14 +11,14 @@ LOG = logging.getLogger(__name__)
 
 class Index(View):
     def get(self, request, *args, **kwargs):
-        decision_data = fetch_decisions()
+        decisions = fetch_decisions()
         twitter = initialize_twitter()
         success_list = []
-        for d in decision_data:
+        for d in decisions:
             tweet_successful = handle_twitter(d, twitter)
             if tweet_successful:
                 success_list.append(d)
             else:
                 success_list.append('------------failed------------')
 
-        return HttpResponse(str(success_list))
+        return HttpResponse(str(decisions))
