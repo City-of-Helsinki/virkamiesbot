@@ -4,6 +4,7 @@ dj-database-url==0.5.0
 Django==2.1
 idna==2.7
 oauthlib==2.1.0
+psycopg2==2.7.5
 PySocks==1.6.8
 pytz==2018.5
 requests==2.19.1
@@ -11,6 +12,5 @@ requests-oauthlib==1.0.0
 six==1.11.0
 tweepy==3.6.0
 urllib3==1.23
+-e git+git@github.com:City-of-Helsinki/virkamiesbot.git@163ed703aa9b7f50296edb2630dfc6e833baf1d3#egg=virkamiesbot&subdirectory=src/virkamiesbot
 whitenoise==4.0
-
--e ./src/virkamiesbot
