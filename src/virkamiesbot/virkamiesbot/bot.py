@@ -1,31 +1,70 @@
 # -*- coding: utf-8 -*-
+
+import logging
 import requests
 from django.utils.html import strip_tags, escape
 
-
+LOG = logging.getLogger(__name__)
 api_url = 'https://dev.hel.fi/paatokset/v1/agenda_item/'
 
-def fetch_decisions():
+def fetch_decisions(since=None, limit=None):
     policymakers = get_policymaker_ids()
-    # policymakers = ["u541000vh1", "u51105100vh1", "u5110510020vh1"]
-    filtered_decisions = []
+    decisions = []
+
     for pmaker in policymakers:
         payload = {'meeting__policymaker__slug': pmaker,
-                   'order_by': 'last_modified_time', 'limit': 1}
+                   'order_by': 'last_modified_time',
+                   'last_modified_time__gt': since}
+
+        if since:
+            payload['last_modified_time__gt'] = since
+
+        if limit:
+            payload['limit'] = limit
+
         response = requests.get(api_url, params=payload)
         if response.ok:
-            decisions = response.json()
-            if decisions['meta']['total_count'] > 0:
-                for d in decisions['objects']:
-                    decision = {'policymaker': d['meeting']['policymaker_name'],
-                                'content': strip_tags(d['content'][0]['text']),
-                                'districts': districts_to_string(d['issue']['districts']),
-                                'permalink': d['permalink']}
-                    filtered_decisions.append(decision)
+            policymaker_decisions = response.json()
+            if policymaker_decisions['objects']:
+                for idx, pmd in enumerate(policymaker_decisions['objects']):
+                    decisions.append(pmd)
 
-    return filtered_decisions
+    if len(decisions) == 0:
+        LOG.info('No new decision in Open Ahjo')
 
-"""Policymaker ids whose decisions are followed from Open Ahjo API
+    return decisions
+
+"""
+Removes unnecessary data from decisions
+"""
+def simplify_decision_data(decisions):
+    simplified_decisions = []
+
+    for d in decisions:
+        content = ''
+
+        for cont in d['content']:
+            if cont['type'] == 'resolution':
+                content = cont['text']
+
+        if content == '':
+            try:
+                content = d['content'][0]['text']
+            except IndexError:
+                content = 'Ei kuvausta'
+
+        decision = {'policymaker': d['meeting']['policymaker_name'],
+                    'content': strip_tags(content),
+                    'districts': districts_to_string(d['issue']['districts']),
+                    'permalink': d['permalink'],
+                    'id': d['id'],
+                    'last_modified_time':d['last_modified_time']}
+        simplified_decisions.append(decision)
+
+    return simplified_decisions
+
+"""
+Policymaker ids whose decisions are followed from Open Ahjo API
 """
 def get_policymaker_ids():
     ids = ["u541000vh1", "u51105100vh1", "u5110510020vh1", "u5110510050vh1",
@@ -59,6 +98,7 @@ def get_policymaker_ids():
            "u5110540010vh1", "u5110540050vh1", "u511054001010vh1",
         #    "kylk", "ryja", "ylja",
         ]
+    LOG.info("Policymaker count:{0}".format(len(ids)))
     return ids
 
 
@@ -68,3 +108,13 @@ def districts_to_string(districts):
         if dist['type'] == 'kaupunginosa':
             district_string += ' #%s' % dist['name']
     return district_string.strip()
+
+
+def add_test_decision():
+    decision = {'policymaker': 'Test Policymaker',
+                'content': 'Päättäjä päätti päättää päätöksen päätöksestä',
+                'districts': 'Tormilankylä,Kiikka',
+                'permalink': 'http://sastamala.fi',
+                'id': '0123456789',
+                'last_modified_time':'2017-05-17T08:00:00.0000'}
+    return [decision]
