@@ -23,7 +23,6 @@ class Command(BaseCommand):
 
     # This is the main method
     def handle(self, *args, **options):
-        Record.objects.all().delete()
         latest_decision_time = init_latest_decision_time()
         decisions = fetch_decisions(since=latest_decision_time)
         decisions = simplify_decision_data(decisions)
