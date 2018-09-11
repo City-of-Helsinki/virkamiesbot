@@ -10,8 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 
-from virkamiesbot.bot import (fetch_decisions, simplify_decision_data,
-    add_test_decision)
+from virkamiesbot.bot import (fetch_decisions, simplify_decision_data)
 from virkamiesbot.twitter import handle_twitter, initialize_twitter
 from virkamiesbot.models import Record
 
@@ -26,10 +25,6 @@ class Command(BaseCommand):
         latest_decision_time = init_latest_decision_time()
         decisions = fetch_decisions(since=latest_decision_time)
         decisions = simplify_decision_data(decisions)
-
-        if len(decisions) == 0:
-            decisions = add_test_decision()
-
         twitter = initialize_twitter()
         success_list = []
         fail_list = []
