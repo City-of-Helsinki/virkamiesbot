@@ -64,7 +64,8 @@ class Command(BaseCommand):
         if latest['source_id'] == '':
             try:
                 obj, created = Record.objects.update_or_create(id=1, defaults=latest)
-            except IntegrityError:
+            except IntegrityError as e:
+                LOG.error(e)
                 return False
 
             if created:
