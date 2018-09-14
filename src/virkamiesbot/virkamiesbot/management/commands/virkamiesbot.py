@@ -26,8 +26,8 @@ class Command(BaseCommand):
     # This is the main method
     def handle(self, *args, **options):
         latest_decision_time = self.init_latest_decision_time()
-        decisions = fetch_decisions(since=latest_decision_time)
-        decisions = simplify_decision_data(decisions)
+        policymaker_decisions = fetch_decisions(since=latest_decision_time)
+        decisions = simplify_decision_data(policymaker_decisions)
         twitter = initialize_twitter()
         success_list = []
         fail_list = []
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                         'source_id': d['id'],
                         'source_created_at':dt}
 
-        if latest['source_id'] == '':
+        if latest['source_id'] != '':
             try:
                 obj, created = Record.objects.update_or_create(id=1, defaults=latest)
             except IntegrityError as e:
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         latest_decision = self.get_latest_decision()
         if not latest_decision:
             tz = pytz.timezone('Europe/Helsinki')
-            date = datetime(2018, 9, 13, 1, 0)
+            date = datetime(2018, 9, 10, 1, 0)
             latest_decision_time = tz.localize(date)
         else:
             latest_decision_time = latest_decision.modified_at

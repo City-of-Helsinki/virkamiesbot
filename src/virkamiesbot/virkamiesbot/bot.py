@@ -9,8 +9,7 @@ api_url = 'https://dev.hel.fi/paatokset/v1/agenda_item/'
 
 def fetch_decisions(since=None, limit=None):
     policymakers = get_policymaker_ids()
-    decisions = []
-
+    policymaker_decisions = []
     for pmaker in policymakers:
         payload = {'meeting__policymaker__slug': pmaker,
                    'order_by': 'last_modified_time',
@@ -22,27 +21,32 @@ def fetch_decisions(since=None, limit=None):
         if limit:
             payload['limit'] = limit
 
-        response = requests.get(api_url, params=payload)
-        if response.ok:
-            policymaker_decisions = response.json()
-            if policymaker_decisions['objects']:
-                for idx, pmd in enumerate(policymaker_decisions['objects']):
-                    decisions.append(pmd)
+        pmd = query_open_ahjo(payload)
+        if pmd['objects']:
+            policymaker_decisions.append(pmd)
 
-    if len(decisions) == 0:
-        LOG.info('No new decision in Open Ahjo')
+    if len(policymaker_decisions) == 0:
+        LOG.info('No new decisions')
 
-    return decisions
+    return policymaker_decisions
+
+def query_open_ahjo(payload):
+    res = None
+    res = requests.get(api_url, params=payload)
+    return res.json()
 
 """
 Removes unnecessary data from decisions
 """
-def simplify_decision_data(decisions):
-    simplified_decisions = []
+def simplify_decision_data(policymaker_decisions):
+    decisions = []
+    for pmd in policymaker_decisions:
+        for d in pmd['objects']:
+            decisions.append(d)
 
+    simplified_decisions = []
     for d in decisions:
         content = ''
-
         for cont in d['content']:
             if cont['type'] == 'resolution':
                 content = cont['text']
