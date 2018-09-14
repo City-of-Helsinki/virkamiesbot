@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "limit": 20,
+    "next": "/paatokset/v1/agenda_item/?limit=20&last_modified_time__gt=2018-1-1&order_by=last_modified_time&offset=20",
+    "offset": 0,
+    "previous": null,
+    "total_count": 10698
+  },
+  "objects": [
+    {
+      "attachments": [
+        {
+          "agenda_item": "/paatokset/v1/agenda_item/94080/",
+          "confidentiality_reason": null,
+          "file_type": "pdf",
+          "file_uri": "http://www.google.com",
+          "hash": "12345789asdqwezzxc",
+          "id": 100001,
+          "name": "Päätös testipäätöksen antamisesta 12.9.2018",
+          "number": 1,
+          "public": true,
+          "resource_uri": "/paatokset/v1/attachment/129601/"
+        }
+      ],
+      "classification_code": "00 10-10-1001",
+      "classification_description": "Luottamushenkilön päätös",
+      "content": [
+        {
+          "text": "<p>Apulaiskoodari päätti olla käyttämättä dockeria kehityksessä say-no-to-docker -jaoston 19.12.2017 § 1 tekemän päätöksen, koskien virtualenvin yksinkertaisuutta ja dockerin tarpeetonta puljaamista.</p>",
+          "type": "resolution"
+        },
+        {
+          "text": "<p>say-no-to-docker -jaosto on käsitellyt virtualenvin paremmuutta ja dockerin turhaa kompleksisuutta 19.12.2017 ja päättänyt esittelijän ehdotusta puoltaen seuraavasti:</p>\n<p>Virtualenvi sentään toimii.</p>",
+          "type": "reasons for resolution"
+        }
+      ],
+      "from_minutes": true,
+      "id": 94080,
+      "index": 1,
+      "introducer": null,
+      "issue": {
+        "category": "/paatokset/v1/category/classified/",
+        "category_name": "Kehittämisen kehittyminen",
+        "category_origin_id": "05 01 00",
+        "districts": [
+          {
+            "name": "Tormilankylä",
+            "type": "kaupunginosa"
+          },
+          {
+            "name": "Kiikka",
+            "type": "osa-alue"
+          }
+        ],
+        "geometries": [],
+        "id": 41401,
+        "last_modified_time": "2018-03-25T11:09:06.806929",
+        "latest_decision_date": "2018-02-13",
+        "reference_text": "",
+        "register_id": "HEL 2017-010771",
+        "resource_uri": "/paatokset/v1/issue/41401/",
+        "slug": "hel-2017-010771",
+        "subject": "Kehitysympäristön valinnan periaatteet käytännössä",
+        "top_category_name": "Kooditoimi"
+      },
+      "last_modified_time": "2018-03-25T11:07:27.734101",
+      "meeting": {
+        "date": "2017-12-21",
+        "id": 30805,
+        "minutes": true,
+        "number": 3,
+        "policymaker": "/paatokset/v1/policymaker/362/",
+        "policymaker_name": "Koodari",
+        "resource_uri": "/paatokset/v1/meeting/30805/",
+        "year": 2017
+      },
+      "origin_last_modified_time": "2017-12-22T11:07:00",
+      "permalink": "www.google.fi",
+      "preparer": "Viljami Ketola",
+      "resolution": null,
+      "resource_uri": "/paatokset/v1/agenda_item/94080/",
+      "subject": "Päätettiin päätös"
+    }
+  ]
+}
