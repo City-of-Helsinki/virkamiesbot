@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-
 import logging
 import pytz
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.generic import View
 
 from virkamiesbot.bot import (fetch_decisions, simplify_decision_data)
@@ -18,7 +18,7 @@ from virkamiesbot.models import Record
 LOG = logging.getLogger(__name__)
 
 TZ = pytz.timezone('Europe/Helsinki')
-
+DESTROY_RECORDS_AFTER = timedelta(hours=1)
 
 class Command(BaseCommand):
     help = 'Virkamiesbot runner management command'
@@ -44,36 +44,32 @@ class Command(BaseCommand):
         LOG.debug('Total: {0}'.format(len(decisions)))
         LOG.debug('Tweeted: {0}'.format(len(success_list)))
         LOG.debug('Failed to tweet: {0}'.format(len(fail_list)))
-
+        self.remove_old_records()
 
     def save_latest_decision(self, decisions, previous_latest_time):
         # decisions must be a list
         # previous_latest_time has to be timezone aware datetime object
 
-        latest = {'source_permalink': '',
-                  'source_id': '',
-                  'source_created_at':''}
+        latest = {'permalink': '',
+                  'id': '',
+                  'created_at':''}
 
         for d in decisions:
             dt = self.time_string_to_datetime(d['last_modified_time'])
             if dt > previous_latest_time:
-                latest = {'source_permalink': d['permalink'],
-                        'source_id': d['id'],
-                        'source_created_at':dt}
+                latest = {'permalink': d['permalink'],
+                        'id': d['id'],
+                        'created_at':dt}
 
-        if latest['source_id'] != '':
+        if latest['id'] != '':
             try:
-                obj, created = Record.objects.update_or_create(id=1, defaults=latest)
+                Record.objects.create(source_permalink=latest['permalink'],
+                                      source_id=latest['id'],
+                                      source_created_at=latest['created_at'])
             except IntegrityError as e:
                 LOG.error(e)
                 return False
-
-            if created:
-                LOG.info("Created new Record")
-            else:
-                LOG.info("Updated Record")
             return True
-
         return False
 
     def init_latest_decision_time(self):
@@ -99,5 +95,10 @@ class Command(BaseCommand):
         dt = datetime.strptime(time_string, "%Y-%m-%dT%H:%M:%S.%f")
         dt = TZ.localize(dt)
         return dt
+
+    def remove_old_records(self):
+        delete_before_date = timezone.now() - DESTROY_RECORDS_AFTER
+        Record.objects.all().filter(modified_at__lt=delete_before_date).delete()
+        return
 
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2
