@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import logging
 import requests
 from django.utils.html import strip_tags, escape
@@ -115,10 +116,7 @@ def districts_to_string(districts):
 
 
 def add_test_decision():
-    decision = {'policymaker': 'Test Policymaker',
-                'content': 'Päättäjä päätti päättää päätöksen päätöksestä',
-                'districts': 'Tormilankylä,Kiikka',
-                'permalink': 'http://sastamala.fi',
-                'id': '0123456789',
-                'last_modified_time':'2017-05-17T08:00:00.0000'}
+    decision = None
+    with open('src/virkamiesbot/virkamiesbot/test_utilities/test_decision.txt') as file:
+        decision = json.loads(file.read())
     return [decision]
