@@ -1,3 +1,4 @@
+import logging
 import tweepy
 from virkamiesbot.settings import (TWITTER_A_TOKEN, TWITTER_A_TOKEN_SECRET,
                                    TWITTER_C_KEY,TWITTER_C_SECRET)
@@ -5,6 +6,7 @@ from virkamiesbot.settings import (TWITTER_A_TOKEN, TWITTER_A_TOKEN_SECRET,
 SEARCH_STRING = ''
 # DEFAULT_TAGS = ['#Helsinki', '#Päätös']
 DEFAULT_TAGS = ['#PÄIVÄNPÄÄTÖSTESTITESTI']
+LOG = logging.getLogger(__name__)
 
 def handle_twitter(decision_data, twitter):
     tweet_content = generate_tweet_text(decision_data)
@@ -16,8 +18,10 @@ def handle_twitter(decision_data, twitter):
 def tweet(twitter_api, msg):
     try:
         response = twitter_api.update_status(msg)
-    except tweepy.error.TweepError:
+    except tweepy.error.TweepError as e:
+        LOG.info(e)
         return False
+
     if response != []:
         return True
     return False
