@@ -13,8 +13,7 @@ def fetch_decisions(since=None, limit=None):
     policymaker_decisions = []
     for pmaker in policymakers:
         payload = {'meeting__policymaker__slug': pmaker,
-                   'order_by': 'last_modified_time',
-                   'last_modified_time__gt': since}
+                   'order_by': 'last_modified_time'}
 
         if since:
             payload['last_modified_time__gt'] = since
