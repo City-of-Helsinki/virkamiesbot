@@ -18,7 +18,8 @@ from virkamiesbot.models import Record
 LOG = logging.getLogger(__name__)
 
 TZ = pytz.timezone('Europe/Helsinki')
-DESTROY_RECORDS_AFTER = timedelta(hours=1)
+DESTROY_RECORDS_AFTER = timedelta(days=60)
+INITIALIZE_SEARCH_TIME = timedelta(min=10)
 
 class Command(BaseCommand):
     help = 'Virkamiesbot runner management command'
@@ -52,41 +53,43 @@ class Command(BaseCommand):
 
         latest = {'permalink': '',
                   'id': '',
-                  'created_at':''}
+                  'last_modified':''}
 
         for d in decisions:
             dt = self.time_string_to_datetime(d['last_modified_time'])
             if dt > previous_latest_time:
                 latest = {'permalink': d['permalink'],
                         'id': d['id'],
-                        'created_at':dt}
+                        'last_modified':dt}
 
         if latest['id'] != '':
             try:
                 Record.objects.create(source_permalink=latest['permalink'],
                                       source_id=latest['id'],
-                                      source_created_at=latest['created_at'])
+                                      source_created_at=latest['last_modified'])
             except IntegrityError as e:
                 LOG.error(e)
                 return False
             return True
+
         return False
 
     def init_latest_decision_time(self):
         latest_decision = self.get_latest_decision()
         if not latest_decision:
             tz = pytz.timezone('Europe/Helsinki')
-            date = datetime(2018, 9, 10, 1, 0)
-            latest_decision_time = tz.localize(date)
+            date = datetime.now()
+            latest_decision_time = tz.localize(date) - INITIALIZE_SEARCH_TIME
         else:
-            latest_decision_time = latest_decision.modified_at
+            latest_decision_time = latest_decision.source_created_at
 
         return latest_decision_time
 
     def get_latest_decision(self):
         try:
-            latest_decision = Record.objects.all().latest('modified_at')
-        except ObjectDoesNotExist:
+            latest_decision = Record.objects.all().latest('created_at')
+        except ObjectDoesNotExist as e:
+            LOG.error(e)
             return None
 
         return latest_decision
