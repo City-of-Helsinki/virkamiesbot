@@ -3,9 +3,7 @@ import tweepy
 from virkamiesbot.settings import (TWITTER_A_TOKEN, TWITTER_A_TOKEN_SECRET,
                                    TWITTER_C_KEY,TWITTER_C_SECRET)
 
-SEARCH_STRING = ''
-# DEFAULT_TAGS = ['#Helsinki', '#Päätös']
-DEFAULT_TAGS = ['#PÄIVÄNPÄÄTÖSTESTITESTI']
+DEFAULT_TAGS = ['#Helsinki', '#Päätös']
 LOG = logging.getLogger(__name__)
 
 def handle_twitter(decision_data, twitter):
