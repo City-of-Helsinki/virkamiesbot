@@ -19,7 +19,7 @@ LOG = logging.getLogger(__name__)
 
 TZ = pytz.timezone('Europe/Helsinki')
 DESTROY_RECORDS_AFTER = timedelta(days=60)
-INITIALIZE_SEARCH_TIME = timedelta(min=10)
+INITIALIZE_SEARCH_TIME = timedelta(minutes=10)
 
 class Command(BaseCommand):
     help = 'Virkamiesbot runner management command'
